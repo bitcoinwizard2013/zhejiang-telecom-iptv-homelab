@@ -1,0 +1,23 @@
+# Local configuration, credentials and evidence must stay outside version control.
+.env
+.env.*
+!.env.example
+config.local.env
+*.local.*
+*.pcap
+*.pcapng
+*.log
+*.m3u
+*.m3u8
+*.yaml
+*.yml
+*.pem
+*.key
+*.pub
+*.tgz
+*.tar*
+*.zip
+.DS_Store
+backups/
+private/
+raw/
