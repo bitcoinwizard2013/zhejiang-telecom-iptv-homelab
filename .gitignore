@@ -21,3 +21,10 @@ config.local.env
 backups/
 private/
 raw/
+
+# Explicitly public examples only
+!channels.example.m3u
+iptv.conf
+channels.m3u
+*.state*
+__pycache__/

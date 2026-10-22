@@ -12,8 +12,10 @@
 
 ---
 
-> **项目状态：实战文档首版 · 2026-10-22**  
-> 已在一个家庭环境中落地，并完成无线终端播放验收。本仓库提供脱敏实录、示例参数和只读检查工具；不是一键安装器，也不承诺跨地区直接通用。
+> **项目状态：v0.2 可运行实验版 · 2026-10-22**  
+> 家庭案例的原有实现已完成无线播放验收；本仓库新增参数化接入客户端、路由维护与 HTTP 视频网关。**公开代码已通过本机隔离模拟测试，尚未在空白 OpenWrt / 真实运营商链路完整验收。** 不承诺跨地区直接通用。
+
+**想实际部署？先看 [可运行版本的完整步骤](RUNTIME.md)。**
 
 ## 这个仓库解决什么问题？
 
@@ -63,11 +65,26 @@ flowchart LR
 | 想提交问题或分享经验 | [隐私与反馈说明](PRIVACY.md) |
 | 想了解原作者和相关项目 | [参考资料与致谢](REFERENCES.md) |
 
-## 仓库提供与暂未提供
+## 可以运行的核心代码
 
-- 提供：原创整理文档、拓扑、占位参数示例、只读检查脚本 `doctor.sh`。
-- 暂未提供：现用定制网关、DHCP 接入脚本和一键部署。这些脚本仍需参数化、来源与许可证核对、异常处理测试后再考虑发布。
-- 不包含：真实账号、Option 60 内容、设备 MAC、家庭网段、频道源清单、原始抓包、路由器备份或代理订阅。
+| 组件 | 文件 | 说明 |
+|---|---|---|
+| DHCP / IPoE 接入 | [iptv_dhcp.pl](iptv_dhcp.pl) | 从私有配置读取自己的身份，校验 OFFER/ACK 与租期 |
+| 路由维护与回滚 | [iptv_access.pl](iptv_access.pl) | 默认预览；只管理专用接口和自己添加的明确路由 |
+| RTSP→HTTP 网关 | [iptv_gateway.pl](iptv_gateway.pl) | 集成重定向处理、TCP interleaved、MPEG-TS 输出与保活 |
+| 安装与启动 | [install.sh](install.sh) / [procd 服务](iptv-homelab.init) | 安装不会自动启动；验证后手动启用 |
+| 可复现测试 | [test_runtime.py](test_runtime.py) | 模拟 DHCP、RTSP、HTTP 和路由操作，不触碰真实链路 |
+
+```sh
+# 本地电脑：模拟测试，不要求 root，不修改网络接口
+python3 test_runtime.py
+# 网关：查看安装计划，不实际安装
+sh install.sh --plan
+```
+
+[完整配置、启动与回滚步骤](RUNTIME.md)使用 [iptv.conf.example](iptv.conf.example) 和 [channels.example.m3u](channels.example.m3u)。旧 `config.example.env` 仅保留为早期参数规划说明，运行程序不读取它。
+
+不包含真实账号、Option 60、家庭设备身份、私人配置或可用频道清单。公开实现不提供认证值生成、DRM 绕过或任意公网转发。
 
 ## 快速检查工具
 
@@ -83,8 +100,8 @@ sh doctor.sh --playlist 'http://YOUR_GATEWAY:8554/playlist.m3u'
 
 ## 后续方向
 
-- [ ] 对定制脚本进行参数化和来源审查。
-- [ ] 与 rtp2httpd 的 RTSP 路径进行独立、可回滚的对照测试。
+- [x] 发布参数化接入、维护、HTTP 网关及独立测试；保留来源与验证边界。
+- [ ] 在空白 OpenWrt 上实测公开版，再与 rtp2httpd 做可回滚的对照测试。
 - [ ] 补充多终端并发、长时间播放和重启恢复测试。
 - [ ] 收集不同地区、设备的脱敏复现记录。
 

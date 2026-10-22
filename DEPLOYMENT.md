@@ -17,7 +17,7 @@
 
 参照 [luckyyyyy #44](https://github.com/luckyyyyy/blog/issues/44) 和 [#75](https://github.com/luckyyyyy/blog/issues/75)，理解当地的 DHCP/IPoE 要求。不要照抄示例 VLAN、MAC、Option 60 或他人的地址。
 
-通过标准 DHCP 客户端还是定制脚本管理租约，应根据当地实际接入方式决定。本案例最终使用维护脚本；首版尚不提供可复用的接入实现。
+通过标准 DHCP 客户端还是定制脚本管理租约，应根据当地实际接入方式决定。本案例最终使用维护脚本；公开实验版接入实现现见 [RUNTIME.md](RUNTIME.md)，尚未通过真实运营商完整验收。
 
 **验收：** IPTV 接口取得有效地址、前缀与专网网关。普通上网的默认路由没有被意外替换。
 
@@ -33,7 +33,7 @@
 
 优先评估已维护的 [rtp2httpd](https://github.com/stackia/rtp2httpd) 及其 [RTSP URL 文档](https://rtp2httpd.com/guide/url-formats)。它已有 RTSP→HTTP 和播放列表功能。
 
-本案例当前使用定制 Perl 网关，并有 RTSP 重定向配套处理。不能将其与 rtp2httpd 等同，也未验证可直接互换；定制代码尚未包含在本仓库。本文记录的是运行方案和取舍，不要求读者重写协议栈。
+本案例当前使用定制 Perl 网关，并有 RTSP 重定向配套处理。不能将其与 rtp2httpd 等同，也未验证可直接互换；本仓库新增的公开实验实现 `iptv_gateway.pl` 内置重定向处理，不需要另一套 RTSP 代理；它并非现网脚本逐字导出，兼容性仍需独立验收，参见 [RUNTIME.md](RUNTIME.md)。
 
 **验收：** HTTP 列表可读取，并且至少一个实际频道能持续播放。还要测试会重定向的频道，不能只试最容易成功的一个。
 
@@ -53,7 +53,7 @@
 
 ## 辅助检查
 
-`config.example.env` 仅是参数规划表，**当前没有安装脚本读取它**，也不会自动应用网络设置。
+运行配置使用 `iptv.conf.example`，详见 [RUNTIME.md](RUNTIME.md)。旧 `config.example.env` 只是参数规划表，不被程序读取。
 
 `doctor.sh` 默认只输出依赖是否存在、接口数量及默认路由数量。它不输出地址或认证值。
 
